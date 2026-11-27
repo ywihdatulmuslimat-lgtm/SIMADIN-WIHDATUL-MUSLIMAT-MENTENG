@@ -217,11 +217,11 @@
         activityPanel.querySelector(':scope > .actions')?.remove();
 
         const dashboardRows = [
-          ...ensureRows('kalender').map(row => ({ row, type: 'kalender' })),
-          ...ensureRows('kegiatan').map(row => ({ row, type: 'kegiatan' }))
+          ...ensureRows('kegiatan').map(row => ({ row, type: 'kegiatan' })),
+          ...ensureRows('kalender').map(row => ({ row, type: 'kalender' }))
         ].filter(item => item.row.tanggal)
           .sort((a, b) => String(b.row.tanggal).localeCompare(String(a.row.tanggal)))
-          .slice(0, 6);
+          .slice(0, 8);
         const openActivity = item => {
           if (item.type === 'kegiatan') {
             state.eventView = item.row.id;
@@ -232,22 +232,22 @@
           state.calendarView = item.row;
           window.go('kalender');
         };
-        activityPanel.querySelectorAll('.quick').forEach((card, index) => {
+        const activityList = dashboardRows.length
+          ? dashboardRows.map(item => `<button type="button" class="quick" data-dashboard-activity="${esc(item.row.id)}" style="width:100%;text-align:left;border:0;background:transparent;cursor:pointer">
+              <span style="color:#087b49;font-size:19px">●</span>
+              <div><b>${esc(item.row.nama || 'Aktivitas Madrasah')}</b>
+              <div class="muted small">${esc(item.type === 'kegiatan' ? (item.row.jenis || 'Kegiatan') : (item.row.kategori || 'Agenda'))} · ${esc(item.row.tanggal || '—')}${item.row.lokasi ? ' · ' + esc(item.row.lokasi) : ''}</div></div>
+            </button>`).join('')
+          : '<div class="empty">Belum ada aktivitas tercatat. Tambahkan kegiatan melalui menu Kegiatan Madrasah.</div>';
+        const oldList = activityPanel.querySelectorAll('.quick');
+        oldList.forEach(node => node.remove());
+        activityPanel.querySelector('.empty')?.remove();
+        activityPanel.insertAdjacentHTML('beforeend', activityList);
+        activityPanel.querySelectorAll('[data-dashboard-activity]').forEach((card, index) => {
           const item = dashboardRows[index];
           if (!item) return;
-          card.setAttribute('role', 'link');
-          card.setAttribute('tabindex', '0');
-          card.setAttribute('aria-label', `Detail aktivitas: ${item.row.nama || 'Agenda'}`);
-          card.style.cursor = 'pointer';
           card.addEventListener('click', () => openActivity(item));
-          card.addEventListener('keydown', event => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              openActivity(item);
-            }
-          });
         });
-        activityPanel.querySelector('.empty')?.replaceChildren('Belum ada aktivitas tercatat.');
       }
     }
     if (current === 'kalender' && state.calendarView) {
