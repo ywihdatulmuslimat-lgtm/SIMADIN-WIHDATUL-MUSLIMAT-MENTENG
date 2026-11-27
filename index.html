@@ -98,24 +98,8 @@ onDOMReady(render);
   });
 
   const nav = document.querySelector('.nav');
-  const menuItems = [
-    ['santri', '♙', 'Data Santri'],
-    ['guru', '♧', 'Data Guru'],
-    ['kelas', '▦', 'Data Kelas'],
-    ['wali', '♧', 'Data Wali Santri'],
-    ['riwayat_kelas', '↗', 'Riwayat Kelas'],
-    ['riwayat_mengajar', '▤', 'Riwayat Mengajar']
-  ];
-  if (nav) {
-    menuItems.forEach(([page, icon, label]) => {
-      if (nav.querySelector(`[data-page="${page}"]`)) return;
-      const button = document.createElement('button');
-      button.dataset.page = page;
-      button.innerHTML = `<span class="ico">${icon}</span>${label}`;
-      button.addEventListener('click', () => go(page));
-      nav.appendChild(button);
-    });
-  }
+  // Menu tambahan yang tidak termasuk navigasi final sengaja tidak ditambahkan.
+  // Data wali tetap dicatat sebagai bagian dari formulir Data Santri; kelas dipilih pada formulir santri.
 
   const style = document.createElement('style');
   style.textContent = `
