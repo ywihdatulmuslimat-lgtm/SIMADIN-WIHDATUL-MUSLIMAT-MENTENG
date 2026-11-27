@@ -217,11 +217,11 @@
         activityPanel.querySelector(':scope > .actions')?.remove();
 
         const dashboardRows = [
-          ...ensureRows('kegiatan').map(row => ({ row, type: 'kegiatan' })),
-          ...ensureRows('kalender').map(row => ({ row, type: 'kalender' }))
+          ...ensureRows('kalender').map(row => ({ row, type: 'kalender' })),
+          ...ensureRows('kegiatan').map(row => ({ row, type: 'kegiatan' }))
         ].filter(item => item.row.tanggal)
           .sort((a, b) => String(b.row.tanggal).localeCompare(String(a.row.tanggal)))
-          .slice(0, 8);
+          .slice(0, 6);
         const openActivity = item => {
           if (item.type === 'kegiatan') {
             state.eventView = item.row.id;
@@ -232,22 +232,22 @@
           state.calendarView = item.row;
           window.go('kalender');
         };
-        const activityList = dashboardRows.length
-          ? dashboardRows.map(item => `<button type="button" class="quick" data-dashboard-activity="${esc(item.row.id)}" style="width:100%;text-align:left;border:0;background:transparent;cursor:pointer">
-              <span style="color:#087b49;font-size:19px">●</span>
-              <div><b>${esc(item.row.nama || 'Aktivitas Madrasah')}</b>
-              <div class="muted small">${esc(item.type === 'kegiatan' ? (item.row.jenis || 'Kegiatan') : (item.row.kategori || 'Agenda'))} · ${esc(item.row.tanggal || '—')}${item.row.lokasi ? ' · ' + esc(item.row.lokasi) : ''}</div></div>
-            </button>`).join('')
-          : '<div class="empty">Belum ada aktivitas tercatat. Tambahkan kegiatan melalui menu Kegiatan Madrasah.</div>';
-        const oldList = activityPanel.querySelectorAll('.quick');
-        oldList.forEach(node => node.remove());
-        activityPanel.querySelector('.empty')?.remove();
-        activityPanel.insertAdjacentHTML('beforeend', activityList);
-        activityPanel.querySelectorAll('[data-dashboard-activity]').forEach((card, index) => {
+        activityPanel.querySelectorAll('.quick').forEach((card, index) => {
           const item = dashboardRows[index];
           if (!item) return;
+          card.setAttribute('role', 'link');
+          card.setAttribute('tabindex', '0');
+          card.setAttribute('aria-label', `Detail aktivitas: ${item.row.nama || 'Agenda'}`);
+          card.style.cursor = 'pointer';
           card.addEventListener('click', () => openActivity(item));
+          card.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              openActivity(item);
+            }
+          });
         });
+        activityPanel.querySelector('.empty')?.replaceChildren('Belum ada aktivitas tercatat.');
       }
     }
     if (current === 'kalender' && state.calendarView) {
@@ -402,7 +402,7 @@
     const edited = state.legalForm === null ? null : rows.find(row => String(row.id) === String(state.legalForm));
     const izop = rows.filter(row => ['Izin Operasional (IZOP)', 'Izin Operasional'].includes(row.jenis));
     const fileActions = row => row.fileData
-      ? `<a class="btn btn-small" href="${esc(row.fileData)}" target="_blank" rel="noopener">Lihat</a> <a class="btn btn-small" href="${esc(row.fileData)}" download="${esc(row.fileName || 'dokumen') }">Unduh</a>`
+      ? `${row.mime && row.mime.startsWith('image/') ? `<a href="${esc(row.fileData)}" target="_blank" rel="noopener"><img src="${esc(row.fileData)}" alt="Foto legalitas" style="width:64px;height:48px;object-fit:cover;border-radius:8px;vertical-align:middle"></a> ` : ''}<a class="btn btn-small" href="${esc(row.fileData)}" target="_blank" rel="noopener">Lihat</a> <a class="btn btn-small" href="${esc(row.fileData)}" download="${esc(row.fileName || 'dokumen') }">${row.mime && row.mime.startsWith('image/') ? 'Unduh Foto' : 'Unduh Dokumen'}</a>`
       : '<span class="muted">File belum dilampirkan</span>';
     const izopRows = izop.map(row => `<tr><td>${esc(row.nama)}</td><td>${esc(row.nomor || '—')}</td><td>${esc(row.tanggal_terbit || '—')}</td><td>${esc(row.tanggal_kedaluwarsa || '—')}</td><td>${fileActions(row)}</td></tr>`).join('');
     const tableRows = filtered.map(row => `<tr>
