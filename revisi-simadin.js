@@ -557,7 +557,7 @@
       ? `<a href="${esc(file.data)}" target="_blank" rel="noopener"><img src="${esc(file.data)}" alt="${esc(file.name)}"></a>`
       : `<iframe sandbox="" title="Pratinjau ${esc(file.name)}" src="${esc(file.data)}"></iframe>`}
       <figcaption>${esc(file.name)} <button class="btn danger" data-remove-file="${kind}" data-event="${esc(eventId)}" data-index="${index}">Hapus</button>
-      ${isPhoto ? '' : `<a class="btn btn-small" href="${esc(file.data)}" download="${esc(file.name)}">Unduh</a>`}</figcaption></figure>`;
+      <a class="btn btn-small" href="${esc(file.data)}" download="${esc(file.name || (isPhoto ? 'foto-kegiatan.jpg' : 'dokumen.pdf'))}">${isPhoto ? 'Unduh Foto' : 'Unduh Dokumen'}</a></figcaption></figure>`;
   }
   function renderEvents() {
     const rows = ensureRows('kegiatan');
