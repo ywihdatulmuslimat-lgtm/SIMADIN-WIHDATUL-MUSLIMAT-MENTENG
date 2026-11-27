@@ -185,6 +185,8 @@
   `;
   document.head.append(extraStyle);
 
+  window.openEventDetail = id => { state.eventView = String(id); state.eventForm = null; window.go('kegiatan'); };
+
   const originalGo = window.go;
   const originalRender = window.render;
   window.go = page => {
@@ -206,7 +208,7 @@
     const result = originalRender();
     if (current === 'dashboard') {
       const activityPanel = [...content.querySelectorAll('.panel')].find(panel =>
-        [...panel.querySelectorAll('.panelhead h3')].some(heading => heading.textContent.trim() === 'Aktivitas Terbaru')
+        [...panel.querySelectorAll('.panelhead h3')].some(heading => ['Aktivitas Terbaru', 'Aktivitas Madrasah'].includes(heading.textContent.trim()))
       );
       if (activityPanel) {
         activityPanel.setAttribute('aria-label', 'Aktivitas Madrasah');
@@ -434,7 +436,7 @@
         <div class="field"><label>Tanggal berlaku</label><input name="tanggal_berlaku" type="date" value="${esc(edited?.tanggal_berlaku || '')}"></div>
         <div class="field"><label>Tanggal kedaluwarsa</label><input name="tanggal_kedaluwarsa" type="date" value="${esc(edited?.tanggal_kedaluwarsa || '')}"></div>
         <div class="field full"><label>Keterangan</label><textarea name="keterangan">${esc(edited?.keterangan || '')}</textarea></div>
-        <div class="field full"><label>File PDF / JPG / JPEG / PNG${edited?.fileData ? ' — kosongkan untuk mempertahankan file' : ' *'}</label><input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" ${edited?.fileData ? '' : 'required'}><small>Prototipe lokal: maksimal 500 KB per file. Gunakan dokumen DEMO saja.</small></div>
+        <div class="field full"><label>Foto atau dokumen legalitas (PDF / JPG / JPEG / PNG)${edited?.fileData ? ' — kosongkan untuk mempertahankan file' : ' *'}</label><input name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" ${edited?.fileData ? '' : 'required'}><small>Unggah foto/scan dokumen legalitas. Prototipe lokal: maksimal 500 KB per file. Gunakan dokumen DEMO saja.</small></div>
         <div class="actions field full"><button class="btn primary" type="submit">Simpan</button><button class="btn" type="button" data-legal-cancel="true">Batal</button></div>
       </form>
     </section>` : ''}
